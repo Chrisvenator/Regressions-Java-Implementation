@@ -1,6 +1,5 @@
 package org.chrisvenator;
 
-import java.util.Map;
 
 public abstract class Regression {
     abstract void fit(double[][] train, double[] labels);
@@ -13,7 +12,7 @@ public abstract class Regression {
         double[][] B = new double[matrix[0].length][matrix.length];
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[0].length; j++) {
-                B[i][j] = matrix[j][i];
+                B[j][i] = matrix[i][j]; // ← was matrix[j][i]
             }
         }
         
@@ -70,9 +69,7 @@ public abstract class Regression {
         // Build augmented matrix [A | I]
         double[][] augmented = new double[N][2 * N];
         for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                augmented[i][j] = matrix[i][j];
-            }
+            System.arraycopy(matrix[i], 0, augmented[i], 0, N);
             augmented[i][i + N] = 1; // identity on the right
         }
         
@@ -116,18 +113,5 @@ public abstract class Regression {
         }
         
         return inverted;
-    }
-    
-    // Identity matrix is a matrix where every value is 0, except for the diagonal. Which is 1
-    // Also called "augmented matrix"
-    protected double[][] createIdentityMatrix(int N) {
-        if (N <= 0) throw new IllegalArgumentException("Matrix size must be positive");
-        
-        double[][] identityMatrix = new double[N][N];
-        for (int i = 0; i < N; i++) {
-            identityMatrix[i][i] = 1;
-        }
-        
-        return identityMatrix;
     }
 }
