@@ -4,7 +4,7 @@ package org.chrisvenator;
  * Hello world!
  *
  */
-public class App 
+public class Example
 {
     public static void main( String[] args )
     {
