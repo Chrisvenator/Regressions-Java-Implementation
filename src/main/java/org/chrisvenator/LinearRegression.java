@@ -1,11 +1,11 @@
 package org.chrisvenator;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 public class LinearRegression extends Regression {
-    private double[] betaHat; //Estimated coefficient vector β^
+    private double[] betaHat;
+    @Getter
+    private RegressionMetrics metrics;
     
     public LinearRegression() {}
     
@@ -17,6 +17,11 @@ public class LinearRegression extends Regression {
         double[][] XtX_inv = super.invertMatrix(XtX);          // (X⊤X)⁻¹
         double[][] XtX_inv_Xt = super.matrixMultiply(XtX_inv, Xt);// (X⊤X)⁻¹X⊤
         this.betaHat = super.matrixMultiplyVector(XtX_inv_Xt, Y); // (X⊤X)⁻¹X⊤y
+        
+        // Compute metrics on training data
+        int numFeatures = X[0].length - 1; // subtract 1 for the intercept column
+        double[] yPred = predictAll(X);
+        this.metrics = new RegressionMetrics(Y, yPred, numFeatures);
     }
     
     // Predict expects a feature vector without a leading 1
@@ -24,10 +29,18 @@ public class LinearRegression extends Regression {
     public double predict(double[] x) {
         // ŷ_i = f̂(x_{i1}, x_{i2}, …, x_{ip}) = β̂_0 + Σ_{j=1}^{p} x_{ij} β̂_j
         double prediction = betaHat[0];
-        for (int i = 1; i < x.length; i++) {
+        for (int i = 1; i < betaHat.length; i++) {
             prediction += x[i - 1] * betaHat[i];
         }
         
         return prediction;
+    }
+    
+    public double[] predictAll(double[][] X) {
+        double[] predictions = new double[X.length];
+        for (int i = 0; i < X.length; i++) {
+            predictions[i] = predict(X[i]);
+        }
+        return predictions;
     }
 }
